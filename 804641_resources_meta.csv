@@ -1,0 +1,15 @@
+"Catalog Info"
+Title,"Real time Air Quality Index"
+Link,https://data.gov.in/catalog/real-time-air-quality-index
+Contributor,"Ministry of Environment, Forest and Climate Change, Central Pollution Control Board"
+Keywords,"Air, Monitoring, quality, Ozone, pollution, SO2, station, NO2, particulate, AQI, PM10, CO, Carbon, Dioxide, Nitrogen, Matter, Polutant, Sulphur, Monoxide"
+Sectors,"Environment and Forest, Industrial Air Pollution, Residential Air Pollution, Vehicular Air Pollution"
+"Published Date","2016/08/04 09:55:40"
+Source,data.gov.in
+"No Of Resources",1
+"Released Under","National Data Sharing and Accessibility Policy (NDSAP)"
+"
+"
+"Resource Info"
+"Resource Title","Resource File","Resource Updated","Resource Size"
+"1. Real time Air Quality Index from various locations",datafile/data_aqi_cpcb.xml,"2022/11/04 07:30:09","188.84 kb",

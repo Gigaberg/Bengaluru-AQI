@@ -1,0 +1,25 @@
+File,Station,Year,Rows,Columns,PM2.5 Missing %,PM10 Missing %,999.99 Count,Duplicate Timestamps
+btm2019.csv,btm,2019,8760,25,8.31,100.0,3,0
+btm2020.csv,btm,2020,8784,25,6.5,99.44,4,0
+btm2021.csv,btm,2021,8760,25,18.61,17.89,32,0
+btm2022.csv,btm,2022,8760,25,7.89,7.66,36,0
+btm2023.csv,btm,2023,8760,25,9.14,9.12,12,0
+btm2024.csv,btm,2024,8784,25,18.42,17.5,17,0
+jayanagar2019.csv,jayanagar,2019,8760,25,12.74,12.19,0,0
+jayanagar2020.csv,jayanagar,2020,8784,25,10.68,10.53,0,0
+jayanagar2021.csv,jayanagar,2021,8760,25,10.86,11.1,0,0
+jayanagar2022.csv,jayanagar,2022,8760,25,17.97,18.05,0,0
+jayanagar2023.csv,jayanagar,2023,8760,25,11.04,11.27,0,0
+jayanagar2024.csv,jayanagar,2024,8784,25,5.77,5.9,0,0
+peenya2019.csv,peenya,2019,8760,25,10.42,100.0,7,0
+peenya2020.csv,peenya,2020,8784,25,3.61,95.78,5,0
+peenya2021.csv,peenya,2021,8760,25,19.79,16.62,3,0
+peenya2022.csv,peenya,2022,8760,25,39.28,31.47,1287,0
+peenya2023.csv,peenya,2023,8760,25,24.29,24.03,1086,0
+peenya2024.csv,peenya,2024,8784,25,11.61,10.96,0,0
+silkboard2019.csv,silkboard,2019,8760,25,8.97,9.02,0,0
+silkboard2020.csv,silkboard,2020,8784,25,8.42,8.21,0,0
+silkboard2021.csv,silkboard,2021,8760,25,14.24,14.2,0,0
+silkboard2022.csv,silkboard,2022,8760,25,18.57,18.82,0,0
+silkboard2023.csv,silkboard,2023,8760,25,8.45,8.56,0,0
+silkboard2024.csv,silkboard,2024,8784,25,6.89,6.81,0,0

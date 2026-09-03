@@ -1,0 +1,41 @@
+# Python / Virtual Environment
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+build/
+dist/
+.next-boost/
+
+# Environment variables & secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# IDE & OS files
+.freebuff/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+
+# Large ML Model files (>50MB, exceeds GitHub limits)
+*.pkl
+!hist_gradient_boosting_change.pkl
+!xgboost_direct.pkl
+!change_imputer.pkl
+!direct_imputer.pkl
+!extra_trees_imputer.pkl

@@ -1,0 +1,298 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-jetbrains-mono);
+
+  /* Dark Mode Colors */
+  --color-obsidian: #111216;
+  --color-graphite: #1B1C22;
+  --color-tungsten: #23252C;
+  --color-carbon: #2E3036;
+  --color-eink: #F5F5F7;
+  --color-steel: #8A8F98;
+
+  /* Light Mode Colors */
+  --color-light-bg: #FFFFFF;
+  --color-light-surface: #F5F5F7;
+  --color-light-surface-elevated: #FFFFFF;
+  --color-light-border: #D1D1D6;
+  --color-light-text-primary: #1D1D1F;
+  --color-light-text-secondary: #6E6E73;
+  --color-light-text-tertiary: #86868B;
+
+  /* AQI Colors (consistent across themes) */
+  --color-aqi-good: #10B981;
+  --color-aqi-moderate: #EAB308;
+  --color-aqi-poor: #F97316;
+  --color-aqi-unhealthy: #EF4444;
+  --color-aqi-severe: #A855F7;
+  --color-aqi-hazardous: #8B5CF6;
+
+  /* Accent Colors - Neon Green Identity */
+  --color-accent-primary: #10B981;
+  --color-accent-primary-hover: #059669;
+  --color-accent-glow: rgba(16, 185, 129, 0.3);
+}
+
+/* ─── Base ──────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--color-obsidian);
+  color: var(--color-eink);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ─── Theme-Specific Styles ─────────────────────────────── */
+.light {
+  --bg-primary: var(--color-light-bg);
+  --bg-secondary: var(--color-light-surface);
+  --bg-elevated: var(--color-light-surface-elevated);
+  --border-color: var(--color-light-border);
+  --text-primary: var(--color-light-text-primary);
+  --text-secondary: var(--color-light-text-secondary);
+  --text-tertiary: var(--color-light-text-tertiary);
+}
+
+.dark {
+  --bg-primary: var(--color-obsidian);
+  --bg-secondary: var(--color-graphite);
+  --bg-elevated: var(--color-tungsten);
+  --border-color: var(--color-carbon);
+  --text-primary: var(--color-eink);
+  --text-secondary: var(--color-steel);
+  --text-tertiary: var(--color-steel);
+}
+
+.light body {
+  background-color: var(--color-light-bg);
+  color: var(--color-light-text-primary);
+}
+
+.dark body {
+  background-color: var(--color-obsidian);
+  color: var(--color-eink);
+}
+
+/* ─── Typography Utility ────────────────────────────────── */
+.font-numeric {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* ─── Data Tables ───────────────────────────────────────── */
+.data-table th {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-steel);
+  border-bottom: 1px solid var(--color-carbon);
+  padding: 0.75rem 1rem;
+}
+
+.light .data-table th {
+  color: var(--color-light-text-secondary);
+  border-bottom-color: var(--color-light-border);
+}
+
+.data-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--color-carbon);
+}
+
+.light .data-table td {
+  border-bottom-color: var(--color-light-border);
+}
+
+.data-table tbody tr:hover {
+  background-color: var(--color-graphite);
+}
+
+.light .data-table tbody tr:hover {
+  background-color: var(--color-light-surface);
+}
+
+/* ─── Telemetry Instrument Styles ───────────────────────── */
+.telemetry-glow {
+  text-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
+}
+
+.light .telemetry-glow {
+  text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+  filter: saturate(1.2);
+}
+
+.pulse-line {
+  position: relative;
+  height: 2px;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+}
+.pulse-line::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 12px currentColor;
+}
+.pulse-line.positive::after { right: 0; }
+.pulse-line.negative::after { left: 0; }
+
+/* ─── Layout & Utilities ────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-obsidian);
+}
+
+.light ::-webkit-scrollbar-track {
+  background: var(--color-light-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-carbon);
+  border-radius: 4px;
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: var(--color-light-border);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-steel);
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-light-text-tertiary);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.mask-edges {
+  mask-image: linear-gradient(to right, transparent, black 12px, black calc(100% - 12px), transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 12px, black calc(100% - 12px), transparent);
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-graphite) 0%,
+    var(--color-tungsten) 50%,
+    var(--color-graphite) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+}
+
+.light .skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-light-surface) 0%,
+    #E8E8ED 50%,
+    var(--color-light-surface) 100%
+  );
+  background-size: 200% 100%;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.btn-press:active {
+  transform: scale(0.97);
+  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─── Motion ───────────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .snap-reveal {
+    animation: snap-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+}
+
+@keyframes snap-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── Page Transitions ──────────────────────────────────── */
+.page-transition {
+  animation: fade-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.page-slide-forward {
+  animation: slide-forward 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.page-slide-backward {
+  animation: slide-backward 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-forward {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-backward {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
