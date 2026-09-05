@@ -33,9 +33,9 @@ load_dotenv()
 # Paths
 # ---------------------------------------------------------------------------
 BASE_DIR   = Path(__file__).parent
-MODELS_DIR = BASE_DIR.parent / "ML Project" / "Air_Quality_Project" / "models"
-DATA_DIR   = BASE_DIR.parent / "ML Project" / "Air_Quality_Project" / "data"
-HIST_CSV   = DATA_DIR / "bengaluru_master_unprocessed.csv"
+MODELS_DIR = BASE_DIR.parent / "ml" / "models"
+DATA_DIR   = BASE_DIR.parent / "ml" / "data"
+HIST_CSV   = DATA_DIR / "bengaluru_master.csv"
 
 # ---------------------------------------------------------------------------
 # Model registry — id → metadata
@@ -105,7 +105,7 @@ MODEL_FEATURES = [
     "PM2.5 (µg/m³)", "PM10 (µg/m³)", "NO (µg/m³)", "NO2 (µg/m³)",
     "NOx (ppb)", "NH3 (µg/m³)", "SO2 (µg/m³)", "CO (mg/m³)",
     "Ozone (µg/m³)", "Benzene (µg/m³)", "Toluene (µg/m³)",
-    "RH (%)", "WD (deg)", "BP (mmHg)",
+    "AT (°C)", "RH (%)", "WS (m/s)", "WD (deg)", "TOT-RF (mm)", "BP (mmHg)",
     "Hour", "DayOfWeek", "Month", "Day",
     "PM25_lag_1h", "PM25_lag_3h", "PM25_lag_6h", "PM25_lag_24h",
 ]
@@ -122,8 +122,11 @@ DISPLAY_NAMES = {
     "Ozone (µg/m³)":   "O₃",
     "Benzene (µg/m³)": "Benzene",
     "Toluene (µg/m³)": "Toluene",
+    "AT (°C)":         "Temperature",
     "RH (%)":          "Humidity",
+    "WS (m/s)":        "Wind Speed",
     "WD (deg)":        "Wind Direction",
+    "TOT-RF (mm)":     "Rainfall",
     "BP (mmHg)":       "Pressure",
     "Hour":            "Hour of Day",
     "DayOfWeek":       "Day of Week",
@@ -223,8 +226,11 @@ class PredictionInput(BaseModel):
     nh3:          Optional[float] = Field(None, description="NH3 (µg/m³)   — defaults to training median 11.48")
     benzene:      Optional[float] = Field(None, description="Benzene (µg/m³) — defaults to 0.30")
     toluene:      Optional[float] = Field(None, description="Toluene (µg/m³) — defaults to 1.27")
+    temp:         Optional[float] = Field(None, description="Temperature (°C) — defaults to 24.5")
     rh:           Optional[float] = Field(None, description="Relative Humidity (%) — defaults to 70.0")
-    wd:           Optional[float] = Field(None, description="Wind Direction (deg)  — defaults to 180.0")
+    ws:           Optional[float] = Field(None, description="Wind Speed (m/s) — defaults to 1.2")
+    wd:           Optional[float] = Field(None, description="Wind Direction (deg) — defaults to 180.0")
+    rf:           Optional[float] = Field(None, description="Rainfall (mm) — defaults to 0.0")
     bp:           Optional[float] = Field(None, description="Barometric Pressure (mmHg) — defaults to 1000.0")
     pm25_lag_1h:  Optional[float] = Field(None, description="PM2.5 1-hour lag  — defaults to current pm25")
     pm25_lag_3h:  Optional[float] = Field(None, description="PM2.5 3-hour lag  — defaults to current pm25")
@@ -265,8 +271,11 @@ def _build_feature_row(inp: PredictionInput) -> pd.DataFrame:
         "Ozone (µg/m³)":   inp.o3      if inp.o3      is not None else 27.25,
         "Benzene (µg/m³)": inp.benzene if inp.benzene is not None else 0.30,
         "Toluene (µg/m³)": inp.toluene if inp.toluene is not None else 1.27,
+        "AT (°C)":         inp.temp    if inp.temp    is not None else 24.5,
         "RH (%)":          inp.rh      if inp.rh      is not None else 70.0,
+        "WS (m/s)":        inp.ws      if inp.ws      is not None else 1.2,
         "WD (deg)":        inp.wd      if inp.wd      is not None else 180.0,
+        "TOT-RF (mm)":     inp.rf      if inp.rf      is not None else 0.0,
         "BP (mmHg)":       inp.bp      if inp.bp      is not None else 1000.0,
         "Hour":            now.hour,
         "DayOfWeek":       now.weekday(),
@@ -354,6 +363,7 @@ def get_historical(
     year:       Optional[int]  = Query(None),
     month:      Optional[int]  = Query(None, ge=1, le=12),
     fields:     Optional[str]  = Query(None, description="Comma-separated list of fields to return. If omitted, returns all fields. Example: aqi,pm25,pm10"),
+    resample:   Optional[str]  = Query(None, description="Resample frequency. Example: 'daily' / 'D', '6h', '12h'"),
 ):
     if _hist_df is None:
         raise HTTPException(503, "Historical data not loaded yet")
@@ -373,9 +383,6 @@ def get_historical(
         cutoff = df["Timestamp"].max() - timedelta(days=days)
         df = df[df["Timestamp"] >= cutoff]
 
-    df = df.sort_values("Timestamp")
-
-    # Vectorized serialization — much faster than iterrows()
     # Map frontend field names to CSV column names
     FIELD_MAP = {
         "pm25":      "PM2.5 (µg/m³)",
@@ -385,25 +392,43 @@ def get_historical(
         "co":        "CO (mg/m³)",
         "so2":       "SO2 (µg/m³)",
         "nh3":       "NH3 (µg/m³)",
+        "temp":      "AT (°C)",
+        "rh":        "RH (%)",
+        "ws":        "WS (m/s)",
+        "wd":        "WD (deg)",
+        "rf":        "TOT-RF (mm)",
     }
 
     # Determine which fields to return
     requested = [f.strip() for f in fields.split(",")] if fields else list(FIELD_MAP.keys())
-    # Always include stationId, timestamp, aqi
     needed_csv_cols = [FIELD_MAP[f] for f in requested if f in FIELD_MAP]
-    select_cols = ["Station", "Timestamp", "aqi"] + needed_csv_cols
-    select_keys = ["stationId", "timestamp", "aqi"] + [f for f in requested if f in FIELD_MAP]
+
+    if resample and not df.empty:
+        rule = "D" if resample.lower() in ("daily", "d") else resample
+        numeric_cols = [c for c in ["aqi"] + needed_csv_cols if c in df.columns]
+        df = (
+            df.set_index("Timestamp")
+            .groupby("Station")[numeric_cols]
+            .resample(rule)
+            .mean(numeric_only=True)
+            .reset_index()
+        )
+
+    df = df.sort_values("Timestamp")
+
+    select_cols = ["Station", "Timestamp", "aqi"] + [c for c in needed_csv_cols if c in df.columns]
 
     raw = df[select_cols].to_dict("records")
     out = []
     for row in raw:
         rec = {
             "stationId": row["Station"],
-            "timestamp": row["Timestamp"].isoformat(),
-            "aqi":       int(row["aqi"]) if pd.notna(row["aqi"]) else None,
+            "timestamp": row["Timestamp"].isoformat() if hasattr(row["Timestamp"], "isoformat") else str(row["Timestamp"]),
+            "aqi":       int(round(row["aqi"])) if pd.notna(row["aqi"]) else None,
         }
         for f, csv_col in zip([f for f in requested if f in FIELD_MAP], needed_csv_cols):
-            rec[f] = float(row[csv_col]) if pd.notna(row[csv_col]) else None
+            val = row.get(csv_col)
+            rec[f] = round(float(val), 2) if pd.notna(val) else None
         out.append(rec)
     return out
 
@@ -483,3 +508,105 @@ def get_model_metrics():
         {"model": meta["label"], "mae": meta["mae"], "rmse": meta["rmse"], "r2": meta["r2"]}
         for meta in MODEL_REGISTRY.values()
     ]
+
+
+@app.get("/projections/annual", tags=["data"])
+def get_annual_projections(
+    station_id: Optional[str] = Query(None),
+    season:     Optional[str] = Query(None, description="Optional season: 'all', 'winter', 'summer', 'monsoon', 'post_monsoon'"),
+):
+    """
+    Returns annual atmospheric metrics from 2019 to 2029:
+      - 2019–2025: Ground-truth actual station measurements (optionally filtered by season)
+      - 2026–2029: Statistical trend forecasts based strictly on the historical dataset
+    """
+    if _hist_df is None:
+        raise HTTPException(503, "Historical data not loaded yet")
+
+    if station_id:
+        if station_id not in STATIONS:
+            raise HTTPException(404, f"Unknown station '{station_id}'. Valid: {list(STATIONS.keys())}")
+        df = _hist_df[_hist_df["Station"] == station_id].copy()
+    else:
+        df = _hist_df.copy()
+
+    # Filter by season if provided
+    SEASON_MONTHS = {
+        "winter":       [12, 1, 2],
+        "summer":       [3, 4, 5],
+        "monsoon":      [6, 7, 8, 9],
+        "post_monsoon": [10, 11],
+    }
+    if season and season.lower() in SEASON_MONTHS:
+        months = SEASON_MONTHS[season.lower()]
+        df = df[df["Timestamp"].dt.month.isin(months)]
+
+    df["Year"] = df["Timestamp"].dt.year
+    historical_years = sorted([y for y in df["Year"].unique() if 2019 <= y <= 2025])
+
+    records = []
+    hist_stats = []
+
+    for y in historical_years:
+        sub = df[df["Year"] == y]
+        pm25 = float(sub["PM2.5 (µg/m³)"].mean()) if "PM2.5 (µg/m³)" in sub else np.nan
+        pm10 = float(sub["PM10 (µg/m³)"].mean())  if "PM10 (µg/m³)" in sub else np.nan
+        no2  = float(sub["NO2 (µg/m³)"].mean())   if "NO2 (µg/m³)" in sub else np.nan
+        temp = float(sub["AT (°C)"].mean())       if "AT (°C)" in sub else np.nan
+        rh   = float(sub["RH (%)"].mean())        if "RH (%)" in sub else np.nan
+        aqi_val = float(sub["aqi"].mean())        if "aqi" in sub and sub["aqi"].notna().any() else np.nan
+
+        aqi_int = int(round(aqi_val)) if not np.isnan(aqi_val) else (pm25_to_aqi(pm25) if not np.isnan(pm25) else 0)
+
+        entry = {
+            "year": int(y),
+            "type": "actual",
+            "pm25": round(pm25, 1) if not np.isnan(pm25) else None,
+            "pm10": round(pm10, 1) if not np.isnan(pm10) else None,
+            "no2":  round(no2, 1)  if not np.isnan(no2) else None,
+            "temp": round(temp, 1) if not np.isnan(temp) else None,
+            "rh":   round(rh, 1)   if not np.isnan(rh) else None,
+            "aqi":  aqi_int,
+            "category": aqi_to_category(aqi_int),
+        }
+        records.append(entry)
+        hist_stats.append(entry)
+
+    # Forecast for 2026-2029
+    future_years = [2026, 2027, 2028, 2029]
+
+    def _forecast_metric(key: str, min_val: float, max_val: float) -> dict:
+        vals = [e[key] for e in hist_stats if e.get(key) is not None]
+        ys = [e["year"] for e in hist_stats if e.get(key) is not None]
+        if len(vals) < 2:
+            return {fy: None for fy in future_years}
+        slope, intercept = np.polyfit(ys, vals, 1)
+        preds = {}
+        for fy in future_years:
+            val = slope * fy + intercept
+            preds[fy] = round(float(np.clip(val, min_val, max_val)), 1)
+        return preds
+
+    pm25_preds = _forecast_metric("pm25", 10.0, 100.0)
+    pm10_preds = _forecast_metric("pm10", 20.0, 200.0)
+    no2_preds  = _forecast_metric("no2",   5.0, 80.0)
+    temp_preds = _forecast_metric("temp", 15.0, 35.0)
+    rh_preds   = _forecast_metric("rh",   40.0, 95.0)
+
+    for fy in future_years:
+        pred_pm25 = pm25_preds[fy]
+        pred_aqi = pm25_to_aqi(pred_pm25) if pred_pm25 is not None else 50
+        records.append({
+            "year": int(fy),
+            "type": "projected",
+            "pm25": pred_pm25,
+            "pm10": pm10_preds[fy],
+            "no2":  no2_preds[fy],
+            "temp": temp_preds[fy],
+            "rh":   rh_preds[fy],
+            "aqi":  pred_aqi,
+            "category": aqi_to_category(pred_aqi),
+        })
+
+    return records
+

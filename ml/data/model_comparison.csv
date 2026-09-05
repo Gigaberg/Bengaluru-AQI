@@ -1,0 +1,5 @@
+Model,MAE,RMSE,R2
+Random Forest — Direct,4.3894,9.6258,0.7667
+XGBoost — Direct,4.8746,13.5203,0.5398
+Random Forest — Change,4.3043,11.2016,0.6848
+HistGradBoost — Change,4.286,11.209,0.6844

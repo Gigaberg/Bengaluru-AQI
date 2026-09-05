@@ -39,3 +39,6 @@ Thumbs.db
 !change_imputer.pkl
 !direct_imputer.pkl
 !extra_trees_imputer.pkl
+
+# Weather API cache files
+ml/data/.cache_weather_*.csv

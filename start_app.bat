@@ -17,7 +17,7 @@ timeout /t 2 /nobreak >nul
 
 :: Start Frontend in a new terminal window
 echo [2/2] Starting Next.js Frontend...
-start "AQI Frontend (Next.js)" cmd /k "cd /d "%~dp0bengaluru-aqi-platform\frontend" && npm run dev"
+start "AQI Frontend (Next.js)" cmd /k "cd /d "%~dp0frontend" && npm run dev"
 
 echo.
 echo =========================================

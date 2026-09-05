@@ -25,19 +25,21 @@ An end-to-end Machine Learning and Explainable AI (XAI) platform for forecasting
 │   ├── requirements.txt                 # Backend dependencies (fastapi, uvicorn, shap, xgboost, httpx, etc.)
 │   └── .env                             # Environment configuration (WAQI_API_TOKEN)
 │
-├── bengaluru-aqi-platform/
-│   └── frontend/                        # Next.js 15 App Router Frontend
-│       ├── src/app/                     # Pages (Dashboard, Historical, Predict, Simulator, Performance, About)
-│       ├── src/components/              # UI Components (AQIMap, StatCards, Charts, RealTimeAQI)
-│       └── src/lib/                     # API client & utilities
+├── frontend/                            # Next.js 15 App Router Frontend
+│   ├── src/app/                         # Pages (Dashboard, Historical, Predict, Simulator, Performance, About)
+│   ├── src/components/                  # UI Components (AQIMap, StatCards, Charts, RealTimeAQI)
+│   └── src/lib/                         # API client & utilities
 │
-├── ML Project/Air_Quality_Project/       # Machine Learning Pipeline
+├── ml/                                  # Machine Learning Pipeline
 │   ├── data/                            # Processed CPCB datasets (2019–2024)
 │   ├── models/                          # Trained ML models (.pkl files)
 │   ├── process_2025.py                  # Dataset cleaning & feature engineering script
 │   └── retrain.py                       # Model training script
 │
-├── CPCB_Bengaluru_Raw/                  # Raw CPCB station CSV files
+├── data/                                # Raw and reference datasets
+│   ├── raw_cpcb/                        # Raw CPCB station CSV files (2019–2024)
+│   └── raw_2025/                        # 2025 raw hourly data files
+│
 └── start_app.bat                        # One-click startup script for Windows
 ```
 
@@ -58,9 +60,9 @@ This will automatically launch the **FastAPI Backend** (`http://localhost:8000`)
 
 ---
 
-### Manual Setup
+## 🛠️ Manual Setup
 
-#### 1. Backend (FastAPI)
+### 1. Backend (FastAPI)
 ```bash
 cd backend
 python -m venv venv
@@ -73,9 +75,9 @@ pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
 ```
 
-#### 2. Frontend (Next.js)
+### 2. Frontend (Next.js)
 ```bash
-cd bengaluru-aqi-platform/frontend
+cd frontend
 npm install
 npm run dev
 ```
