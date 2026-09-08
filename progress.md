@@ -116,3 +116,11 @@ All models are defined in `MODEL_REGISTRY` inside `backend/main.py`:
   - `frontend/src/components/HistoricalClient.tsx`: Added defensive `temp: 42` clamp to `CAPS` in `capReadings()`.
   - `.gitignore`: Added rules to ignore temporary Open-Meteo cache files (`ml/data/.cache_weather_*.csv`).
 - **Rationale:** Resolved unnatural 50°C temperature spikes in Jayanagar historical charts, provided users with long-term 2019–2029 projection capabilities, and configured the backend for cloud deployment (Vercel/Render).
+
+### Entry: 2026-09-08 — Strategy 1 Deployment Config (Render/Railway Dockerfile & Procfile, Vercel Readiness)
+- **Author / Agent:** Antigravity (Gemini 3.8 Flash)
+- **Files Created/Modified:**
+  - `backend/Dockerfile`: Created container spec bundling backend code and `ml/` (models & master dataset) with multi-worker uvicorn and dynamic port resolution.
+  - `backend/Procfile`: Added native Python process entry for PaaS providers like Render/Railway.
+  - `progress.md`: Appended deployment instructions and verification records.
+- **Rationale:** Tested and verified frontend production build (`next build` / Turbopack passed cleanly). Prepared container and process definitions so the FastAPI backend can be deployed independently of the Next.js frontend with proper environment and asset binding.
