@@ -122,5 +122,6 @@ All models are defined in `MODEL_REGISTRY` inside `backend/main.py`:
 - **Files Created/Modified:**
   - `backend/Dockerfile`: Created container spec bundling backend code and `ml/` (models & master dataset) with multi-worker uvicorn and dynamic port resolution.
   - `backend/Procfile`: Added native Python process entry for PaaS providers like Render/Railway.
+  - `backend/main.py`: Made model loading graceful so missing uncommitted optional models (like >500MB random_forest_direct.pkl) don't crash container startup.
   - `progress.md`: Appended deployment instructions and verification records.
 - **Rationale:** Tested and verified frontend production build (`next build` / Turbopack passed cleanly). Prepared container and process definitions so the FastAPI backend can be deployed independently of the Next.js frontend with proper environment and asset binding.

@@ -182,23 +182,30 @@ _hist_df: Optional[pd.DataFrame] = None
 def load_resources():
     global _hist_df
 
-    # Load each model in the registry
+    # Load each model in the registry (skip gracefully if pickle file is not in repo)
     for model_id, meta in MODEL_REGISTRY.items():
         pkl_path = MODELS_DIR / meta["pkl"]
+        if not pkl_path.exists():
+            print(f"[startup] Notice: Model file {meta['pkl']} not found on disk, skipping.")
+            continue
+
         print(f"[startup] Loading {meta['label']} …")
-        with open(pkl_path, "rb") as f:
-            pipeline = pickle.load(f)
-        _models[model_id] = pipeline
-
-        # Build SHAP explainer on the final estimator inside the Pipeline
-        estimator = pipeline.named_steps["model"]
         try:
-            _explainers[model_id] = shap.TreeExplainer(estimator)
-            print(f"[startup]   SHAP explainer ready for {model_id}")
-        except Exception as e:
-            print(f"[startup]   SHAP unavailable for {model_id}: {e}")
+            with open(pkl_path, "rb") as f:
+                pipeline = pickle.load(f)
+            _models[model_id] = pipeline
 
-    print(f"[startup] {len(_models)} models loaded")
+            # Build SHAP explainer on the final estimator inside the Pipeline
+            estimator = pipeline.named_steps["model"]
+            try:
+                _explainers[model_id] = shap.TreeExplainer(estimator)
+                print(f"[startup]   SHAP explainer ready for {model_id}")
+            except Exception as e:
+                print(f"[startup]   SHAP unavailable for {model_id}: {e}")
+        except Exception as e:
+            print(f"[startup] Failed to load {meta['label']}: {e}")
+
+    print(f"[startup] {len(_models)} models loaded: {list(_models.keys())}")
 
     # Historical data
     print(f"[startup] Loading historical data …")
@@ -352,6 +359,7 @@ def list_models():
             "recommended": meta.get("recommended", False),
         }
         for mid, meta in MODEL_REGISTRY.items()
+        if mid in _models
     ]
 
 
