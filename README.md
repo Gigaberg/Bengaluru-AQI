@@ -1,23 +1,23 @@
-# 🍃 Bengaluru Air Quality Index (AQI) Intelligence & Machine Learning Platform
+#  Bengaluru Air Quality Index (AQI) Intelligence & Machine Learning Platform
 
 An end-to-end Machine Learning and Explainable AI (XAI) platform for forecasting, explaining, and simulating Air Quality Index (AQI) dynamics across monitoring stations in Bengaluru, India.
 
 ---
 
-## 🌟 Highlights & Features
+##  Highlights & Features
 
-- 📊 **Real-Time & Historical Monitoring**: View live telemetry via WAQI API integration and explore historical atmospheric data from 2019 to 2024 across key stations (BTM Layout, Jayanagar, Silk Board, Peenya).
-- 🤖 **ML Predictive Models**: 
+-  **Real-Time & Historical Monitoring**: View live telemetry via WAQI API integration and explore historical atmospheric data from 2019 to 2024 across key stations (BTM Layout, Jayanagar, Silk Board, Peenya).
+-  **ML Predictive Models**: 
   - **HistGradientBoosting** (Change Model — Best $R^2 = 0.82$, $\text{RMSE} = 17.43$)
   - **Random Forest** (Change & Direct Models)
   - **XGBoost** (Direct Model)
-- 🔍 **Explainable AI (SHAP)**: Understand which specific pollutants (PM2.5, PM10, $\text{NO}_2$, $\text{O}_3$, $\text{CO}$) and temporal features drive air quality predictions in real-time.
-- 🧪 **Policy Simulation Matrix**: Interactive policy sandbox to simulate emission reduction scenarios (e.g. 20% vehicle cut, 30% dust reduction) and calculate theoretical AQI improvements.
-- 🎨 **Modern Instrument Dashboard**: Clean, responsive, glassmorphism UI built with Next.js 15, Tailwind CSS, and Recharts.
+-  **Explainable AI (SHAP)**: Understand which specific pollutants (PM2.5, PM10, $\text{NO}_2$, $\text{O}_3$, $\text{CO}$) and temporal features drive air quality predictions in real-time.
+-  **Policy Simulation Matrix**: Interactive policy sandbox to simulate emission reduction scenarios (e.g. 20% vehicle cut, 30% dust reduction) and calculate theoretical AQI improvements.
+-  **Modern Instrument Dashboard**: Clean, responsive, glassmorphism UI built with Next.js 15, Tailwind CSS, and Recharts.
 
 ---
 
-## 📁 Repository Structure
+##  Repository Structure
 
 ```text
 ├── backend/                             # FastAPI Python Backend
@@ -45,7 +45,7 @@ An end-to-end Machine Learning and Explainable AI (XAI) platform for forecasting
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Prerequisites
 - Python 3.10+
@@ -85,7 +85,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 🔌 API Integration
+##  API Integration
 
 To enable live station feeds on the dashboard, create a `.env` file inside the `backend/` directory:
 ```env
@@ -95,7 +95,7 @@ WAQI_API_TOKEN=your_free_waqi_api_token
 
 ---
 
-## 🏆 Model Performance Summary
+##  Model Performance Summary
 
 | Model | Approach | $R^2$ Score | MAE | RMSE | Status |
 | :--- | :--- | :---: | :---: | :---: | :---: |
