@@ -4,7 +4,7 @@
 > ### 🤖 MANDATORY AI INSTRUCTION FOR ALL AI CODING ASSISTANTS
 > **STOP AND READ BEFORE MAKING ANY CHANGES:**
 > 1. **ALWAYS READ THIS FILE FIRST:** Any AI assistant working on this repository MUST read this `progress.md` file before inspecting or editing other files. It contains the exact technical architecture, operational quirks, and established conventions of this codebase.
-> 2. **ALWAYS UPDATE THIS LOG BOOK:** Whenever you plan to make, or have made, any file changes, bugs fixes, or feature additions, you **MUST append an entry to the [Project Change Log & Work History](#-project-change-log--work-history) section at the bottom of this file**.
+> 2. **ALWAYS UPDATE THIS LOG BOOK BEFORE & AFTER EDITING:** Whenever you plan to make, or have made, any file changes, bug fixes, refactoring, or feature additions, you **MUST update this file** and append an entry to the [Project Change Log & Work History](#-5-project-change-log--work-history) section at the bottom of this file.
 > 3. Document: Date, Files Modified, What Changed, and Technical Rationale. This prevents future AI sessions from repeating past mistakes or having to read through hundreds of files to understand the system state.
 
 ---
@@ -24,6 +24,13 @@ Bengaluru-AQI/
 │   ├── src/app/                   # App routes (/, /predict, /historical, /simulator, /model-performance)
 │   ├── src/components/            # Modular React UI components (Dark mode, glassmorphism, Recharts)
 │   └── src/lib/                   # API client (api.ts), types (types.ts), AQI helpers (aqi.ts)
+│
+├── src/                             # Reusable production ML & data engineering package
+│   ├── data/                        # Ingestion, validation, and station loader
+│   ├── preprocessing/               # Weather backfill, glitch cleaning, feature lags
+│   ├── models/                      # Baseline, HistGBM, RF, and XGBoost architectures
+│   ├── evaluation/                  # CPCB sub-index, RMSE, MAE, R2 evaluation metrics
+│   └── inference/                   # Low-latency predictor runtime for backend API
 │
 ├── ml/                            # ML Pipeline & Offline Data Processing
 │   ├── data/
@@ -125,3 +132,12 @@ All models are defined in `MODEL_REGISTRY` inside `backend/main.py`:
   - `backend/main.py`: Made model loading graceful so missing uncommitted optional models (like >500MB random_forest_direct.pkl) don't crash container startup.
   - `progress.md`: Appended deployment instructions and verification records.
 - **Rationale:** Tested and verified frontend production build (`next build` / Turbopack passed cleanly). Prepared container and process definitions so the FastAPI backend can be deployed independently of the Next.js frontend with proper environment and asset binding.
+
+### Entry: 2026-10-01 — Modular `src/` ML Package Refactoring
+- **Author / Agent:** Antigravity (Gemini 3.8 Flash)
+- **Files Created/Modified:**
+  - `src/`: Established standalone modular Python package with `data`, `preprocessing`, `models`, `evaluation`, and `inference` submodules.
+  - `ml/retrain.py`: Refactored to import feature engineering, model training, and CPCB evaluation from `src/`.
+  - `backend/main.py`: Refactored to import inference engine and model schemas from `src/inference`.
+  - `progress.md`: Updated architecture tree and mandatory agent instructions.
+- **Rationale:** Modularized reusable Python code out of one-off scripts/notebooks into a clean production package while preserving backward compatibility and model weights.
