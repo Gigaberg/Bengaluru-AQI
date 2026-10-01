@@ -30,11 +30,19 @@ An end-to-end Machine Learning and Explainable AI (XAI) platform for forecasting
 │   ├── src/components/                  # UI Components (AQIMap, StatCards, Charts, RealTimeAQI)
 │   └── src/lib/                         # API client & utilities
 │
-├── ml/                                  # Machine Learning Pipeline
+├── src/                                 # Core Python ML & Data Science Package
+│   ├── data/                            # Ingestion (CPCB raw loaders, historical manager)
+│   ├── preprocessing/                   # Sensor sanitation, temporal cycles, lag generators
+│   ├── models/                          # CPCB standards, model registry, training pipelines
+│   ├── evaluation/                      # Regression metrics (RMSE, MAE, R2), tier diagnostics
+│   └── inference/                       # Production predictor, policy simulator, SHAP explainer
+│
+├── ml/                                  # Machine Learning Experiments & Artifacts
 │   ├── data/                            # Processed CPCB datasets (2019–2024)
 │   ├── models/                          # Trained ML models (.pkl files)
+│   ├── notebooks/                       # Exploratory analysis & data audit notebooks
 │   ├── process_2025.py                  # Dataset cleaning & feature engineering script
-│   └── retrain.py                       # Model training script
+│   └── retrain.py                       # Model retraining script using src package
 │
 ├── data/                                # Raw and reference datasets
 │   ├── raw_cpcb/                        # Raw CPCB station CSV files (2019–2024)
